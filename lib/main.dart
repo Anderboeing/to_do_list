@@ -78,7 +78,7 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 class ItemCard extends StatefulWidget {
-  ItemCard({super.key, this.textTask = 'lorem ipsum dolor sit amet'});
+  const ItemCard({super.key, this.textTask = 'lorem ipsum dolor sit amet'});
 
   final String textTask;
 
@@ -89,7 +89,7 @@ class ItemCard extends StatefulWidget {
 class _ItemCardState extends State<ItemCard> {
   IconData checkBox = Icons.check_box_outline_blank;
 
-  void checkTest() {
+  void checkTask() {
     setState(() {
       if (checkBox == Icons.check_box_outlined) {
         checkBox = Icons.check_box_outline_blank;
@@ -107,7 +107,7 @@ class _ItemCardState extends State<ItemCard> {
         children: [
           Row(
             children: [
-              IconButton(onPressed: checkTest, icon: Icon(checkBox)),
+              IconButton(onPressed: checkTask, icon: Icon(checkBox)),
 
               checkBox == Icons.check_box_outlined
                   ? Text(
