@@ -78,13 +78,27 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 class ItemCard extends StatefulWidget {
-  const ItemCard({super.key});
+  ItemCard({super.key, this.textTask = 'lorem ipsum dolor sit amet'});
+
+  final String textTask;
 
   @override
   State<ItemCard> createState() => _ItemCardState();
 }
 
 class _ItemCardState extends State<ItemCard> {
+  IconData checkBox = Icons.check_box_outline_blank;
+
+  void checkTest() {
+    setState(() {
+      if (checkBox == Icons.check_box_outlined) {
+        checkBox = Icons.check_box_outline_blank;
+      } else {
+        checkBox = Icons.check_box_outlined;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card.outlined(
@@ -93,11 +107,16 @@ class _ItemCardState extends State<ItemCard> {
         children: [
           Row(
             children: [
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.check_box_outlined),
-              ),
-              const Text('Hello WOrld!'),
+              IconButton(onPressed: checkTest, icon: Icon(checkBox)),
+
+              checkBox == Icons.check_box_outlined
+                  ? Text(
+                      widget.textTask,
+                      style: const TextStyle(
+                        decoration: TextDecoration.lineThrough,
+                      ),
+                    )
+                  : Text(widget.textTask),
             ],
           ),
 
