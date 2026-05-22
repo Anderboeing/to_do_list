@@ -27,15 +27,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
   final GlobalKey<FormState> _task = GlobalKey<FormState>();
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +36,6 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
         centerTitle: true,
-
       ),
       body: Center(
         child: Column(
@@ -52,35 +43,67 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             Form(
               key: _task,
-                child:Row(
-                  children: [
-                    Expanded(
-                      child: TextFormField(
-                        decoration: const InputDecoration(
-                          hintText: 'Add New Task',
-                        ),
-                        validator: (String? value){
-                          if(value == null || value.isEmpty) return "Digite algum trem";
-                          return null;
-                        },
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      decoration: const InputDecoration(
+                        hintText: 'Add New Task',
                       ),
-                    ),
-                    IconButton.outlined(
-                      onPressed: () {
-                        if (_task.currentState!.validate()) {
-                          // TODO: Add task logic
-                        }
+                      validator: (String? value) {
+                        if (value == null || value.isEmpty)
+                          return "Digite algum trem";
+                        return null;
                       },
-                      icon: const Icon(Icons.add),
-                    )
-                  ],
-                )
+                    ),
+                  ),
+                  IconButton.outlined(
+                    onPressed: () {
+                      if (_task.currentState!.validate()) {
+                        // TODO: Add task logic
+                      }
+                    },
+                    icon: const Icon(Icons.add),
+                  ),
+                ],
+              ),
             ),
 
+            ItemCard(),
           ],
         ),
       ),
+    );
+  }
+}
 
+class ItemCard extends StatefulWidget {
+  const ItemCard({super.key});
+
+  @override
+  State<ItemCard> createState() => _ItemCardState();
+}
+
+class _ItemCardState extends State<ItemCard> {
+  @override
+  Widget build(BuildContext context) {
+    return Card.outlined(
+      child: Row(
+        mainAxisAlignment: .spaceBetween,
+        children: [
+          Row(
+            children: [
+              IconButton(
+                onPressed: () {},
+                icon: const Icon(Icons.check_box_outlined),
+              ),
+              const Text('Hello WOrld!'),
+            ],
+          ),
+
+          IconButton(onPressed: () {}, icon: const Icon(Icons.close)),
+        ],
+      ),
     );
   }
 }
