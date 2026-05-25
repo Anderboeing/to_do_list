@@ -29,6 +29,23 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final GlobalKey<FormState> _task = GlobalKey<FormState>();
 
+  final TextEditingController _controller = TextEditingController();
+
+  List<String> _toDoList = [];
+
+  void _addList() {
+    setState(() {
+      _toDoList.add(_controller.text);
+      _controller.clear();
+    });
+  }
+
+  void _removeItem(int index) {
+    setState(() {
+      _toDoList.removeAt(index);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,6 +64,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 children: [
                   Expanded(
                     child: TextFormField(
+                      controller: _controller,
                       decoration: const InputDecoration(
                         hintText: 'Add New Task',
                       ),
@@ -60,7 +78,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   IconButton.outlined(
                     onPressed: () {
                       if (_task.currentState!.validate()) {
-                        // TODO: Add task logic
+                        _addList();
                       }
                     },
                     icon: const Icon(Icons.add),
@@ -68,8 +86,18 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               ),
             ),
-
-            ItemCard(),
+            Expanded(
+              child: _toDoList.isNotEmpty
+                  ? ListView.builder(
+                      padding: EdgeInsets.all(8),
+                      itemCount: _toDoList.length,
+                      itemBuilder: (context, index) => ItemCard(
+                        textTask: _toDoList[index].toString(),
+                        onRemove: () => _removeItem(index),
+                      ),
+                    )
+                  : Text('Lista Vazia'),
+            ),
             CounterList(),
           ],
         ),
@@ -79,9 +107,14 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 class ItemCard extends StatefulWidget {
-  const ItemCard({super.key, this.textTask = 'lorem ipsum dolor sit amet'});
+  const ItemCard({
+    super.key,
+    this.textTask = 'lorem ipsum dolor sit amet',
+    required this.onRemove,
+  });
 
   final String textTask;
+  final VoidCallback onRemove;
 
   @override
   State<ItemCard> createState() => _ItemCardState();
@@ -121,7 +154,7 @@ class _ItemCardState extends State<ItemCard> {
             ],
           ),
 
-          IconButton(onPressed: () {}, icon: const Icon(Icons.close)),
+          IconButton(onPressed: widget.onRemove, icon: const Icon(Icons.close)),
         ],
       ),
     );
