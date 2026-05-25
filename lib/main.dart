@@ -31,11 +31,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
   final TextEditingController _controller = TextEditingController();
 
-  List<String> _toDoList = [];
+  final List<ToDoItem> _toDoList = [];
+
+  int get _counterList => _toDoList.where((item) => !item.isChecked).length;
 
   void _addList() {
     setState(() {
-      _toDoList.add(_controller.text);
+      _toDoList.add(ToDoItem(task: _controller.text));
       _controller.clear();
     });
   }
@@ -43,6 +45,12 @@ class _MyHomePageState extends State<MyHomePage> {
   void _removeItem(int index) {
     setState(() {
       _toDoList.removeAt(index);
+    });
+  }
+
+  void _toggleItem(int index) {
+    setState(() {
+      _toDoList[index].isChecked = !_toDoList[index].isChecked;
     });
   }
 
@@ -54,56 +62,77 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
         centerTitle: true,
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: .center,
-          children: [
-            Form(
-              key: _task,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextFormField(
-                      controller: _controller,
-                      decoration: const InputDecoration(
-                        hintText: 'Add New Task',
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: .center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Form(
+                key: _task,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        controller: _controller,
+                        decoration: const InputDecoration(
+                          hintText: 'Add New Task',
+                        ),
+                        validator: (String? value) {
+                          if (value == null || value.isEmpty)
+                            return "Digite algum trem";
+                          return null;
+                        },
                       ),
-                      validator: (String? value) {
-                        if (value == null || value.isEmpty)
-                          return "Digite algum trem";
-                        return null;
-                      },
                     ),
-                  ),
-                  IconButton.outlined(
-                    onPressed: () {
-                      if (_task.currentState!.validate()) {
-                        _addList();
-                      }
-                    },
-                    icon: const Icon(Icons.add),
-                  ),
+                    IconButton.outlined(
+                      onPressed: () {
+                        if (_task.currentState!.validate()) {
+                          _addList();
+                        }
+                      },
+                      icon: const Icon(Icons.add),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: _toDoList.isNotEmpty
+                    ? ListView.builder(
+                        padding: EdgeInsets.all(8),
+                        itemCount: _toDoList.length,
+                        itemBuilder: (context, index) => ItemCard(
+                          textTask: _toDoList[index].task,
+                          onRemove: () => _removeItem(index),
+                          isChecked: _toDoList[index].isChecked,
+                          onToggle: () => _toggleItem(index),
+                        ),
+                      )
+                    : Text('Lista Vazia'),
+              ),
+              Column(
+                children: [
+                  CounterList(counter: _counterList),
+                  Divider(height: 16),
                 ],
               ),
-            ),
-            Expanded(
-              child: _toDoList.isNotEmpty
-                  ? ListView.builder(
-                      padding: EdgeInsets.all(8),
-                      itemCount: _toDoList.length,
-                      itemBuilder: (context, index) => ItemCard(
-                        textTask: _toDoList[index].toString(),
-                        onRemove: () => _removeItem(index),
-                      ),
-                    )
-                  : Text('Lista Vazia'),
-            ),
-            CounterList(),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
+}
+
+class ToDoItem {
+  ToDoItem({
+    this.task = 'lorem impsum qualquer coisa aí',
+    this.isChecked = false,
+  });
+
+  final String task;
+  bool isChecked;
 }
 
 class ItemCard extends StatefulWidget {
@@ -111,10 +140,14 @@ class ItemCard extends StatefulWidget {
     super.key,
     this.textTask = 'lorem ipsum dolor sit amet',
     required this.onRemove,
+    this.isChecked = false,
+    required this.onToggle,
   });
 
   final String textTask;
   final VoidCallback onRemove;
+  final VoidCallback onToggle;
+  final bool isChecked;
 
   @override
   State<ItemCard> createState() => _ItemCardState();
@@ -122,16 +155,6 @@ class ItemCard extends StatefulWidget {
 
 class _ItemCardState extends State<ItemCard> {
   IconData checkBox = Icons.check_box_outline_blank;
-
-  void checkTask() {
-    setState(() {
-      if (checkBox == Icons.check_box_outlined) {
-        checkBox = Icons.check_box_outline_blank;
-      } else {
-        checkBox = Icons.check_box_outlined;
-      }
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -141,9 +164,16 @@ class _ItemCardState extends State<ItemCard> {
         children: [
           Row(
             children: [
-              IconButton(onPressed: checkTask, icon: Icon(checkBox)),
+              IconButton(
+                onPressed: widget.onToggle,
+                icon: Icon(
+                  widget.isChecked
+                      ? Icons.check_box_outlined
+                      : Icons.check_box_outline_blank,
+                ),
+              ),
 
-              checkBox == Icons.check_box_outlined
+              widget.isChecked
                   ? Text(
                       widget.textTask,
                       style: const TextStyle(
@@ -173,6 +203,7 @@ class _CounterListState extends State<CounterList> {
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [Text('Your remaining To Dos: '), Text('${widget.counter}')],
     );
   }
