@@ -70,6 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
 
             ItemCard(),
+            CounterList(),
           ],
         ),
       ),
@@ -123,6 +124,23 @@ class _ItemCardState extends State<ItemCard> {
           IconButton(onPressed: () {}, icon: const Icon(Icons.close)),
         ],
       ),
+    );
+  }
+}
+
+class CounterList extends StatefulWidget {
+  const CounterList({super.key, this.counter = 0});
+  final int counter;
+
+  @override
+  State<CounterList> createState() => _CounterListState();
+}
+
+class _CounterListState extends State<CounterList> {
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [Text('Your remaining To Dos: '), Text('${widget.counter}')],
     );
   }
 }
